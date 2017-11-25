@@ -61,13 +61,38 @@ router.route('/exercise1_task1')
         // =================================================================================================================
         let exercise_1_Message = {
                 message: 'exercise_1',
-                numberUsers: '3',
-                userNames:['root','group8','somaia'],
-                numStorageDisks:'3',
-                storageDisksInfo:['5G', '1G', '1G']
+                numberUsers: 'x',
+                userNames:['x','y'],
+                numStorageDisks:'xy',
+                storageDisksInfo:['size1', 'size2', 'size3']
             };
-        res.json( exercise_1_Message);
+        exec("who | wc -l",function (error, stdout, stderr)
+        {
+            var lines = stdout.toString().split('\n');
+            exercise_1_Message.numberUsers=lines[0];
+            exec("who | cut -d \" \" -f 1",function (error, stdout, stderr)
+            {
+                var lines = stdout.toString().split('\n');
+                lines = lines.filter(Boolean)
+                exercise_1_Message.userNames=lines;
+                exec("fdisk -l | grep \"^Disk\" | grep \"vd\" | cut -f 1 -d ',' | cut -f 3- -d '/' | wc -l",function (error, stdout, stderr)
+                {
+                    var lines = stdout.toString().split('\n');
+                    lines = lines.filter(Boolean)
+                    exercise_1_Message.numStorageDisks=lines[0];
+                    exec("fdisk -l | grep \"^Disk\" | grep \"vd\" | cut -f 1 -d ',' | cut -f 3- -d '/'",function (error, stdout, stderr)
+                    {
+                        var lines = stdout.toString().split('\n');
+                        lines = lines.filter(Boolean)
+                        exercise_1_Message.storageDisksInfo=lines;
+                        console.log(exercise_1_Message);
+                        res.json( exercise_1_Message);
+                    });
+                });
 
+            });
+
+        });
     });
 /**
  * Exercise 1: Task 2 Route (Service Level Authentication)
@@ -109,14 +134,25 @@ router.route('/exercise1_task2')
          * second value the expected password
          */
         if (!((auth[0]=='CCS') && (auth[1] == 'ccs_exercise1_task2'))) {
+            res.statusCode = 401;
+            res.setHeader('WWW-Authenticate', 'Basic realm="Enter the Username and Passord:"');
             res.end('Unsuccessful Authentication');
         }
         else {
             /**
              * Processing can be continued here, user was authenticated
              */
+            res.statusCode = 200;
             res.send('Successful Authentication');
         }
+    });
+/**
+ * Exercise 2: Send a message "group 8 application deployed using docker"
+ */
+router.route('/exercise2')
+    .get(function(req, res)
+    {
+        res.send("group 8 application deployed using docker");
     });
 /**
  * REGISTER OUR ROUTES
@@ -129,12 +165,3 @@ app.use('/exercises', router);
  */
 app.listen(port);
 console.log('Server started and listening on port ' + port);
-
-
-
-
-
-
-
-
-
