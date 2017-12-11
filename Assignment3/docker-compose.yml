@@ -1,0 +1,16 @@
+version: '2'
+services:
+  server:
+    build: ./server
+    image: sahilkalra/microservice:server
+    ports:
+      - "8080:8080"
+  hello-world-service:
+    build: ./hello-world-service
+    image: sahilkalra/microservice:hello
+  product-descp-service:
+    build: ./product-descp-service
+    image: sahilkalra/microservice:productdescp
+  product-price-service:
+    build: ./product-price-service
+    image: sahilkalra/microservice:productprice
